@@ -1,0 +1,60 @@
+<section>
+  <div class="form-group">
+    <h1 class="display-3 text-center">Note Book</h1>
+    <div class="col-7 mb-3 cent ">
+
+      <textarea class="form-control form-control-lg" (dblclick)="highlight($event)" id="exampleFormControlTextarea1"
+        rows="10" name="content" [(ngModel)]="content"></textarea>
+
+    </div>
+
+  </div>
+  <div *ngIf="this.show" class="m-3">
+    <h1 class="display-6 text-center">Result</h1>
+    <div class="list-group col-sm-3 cent">
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+
+        <div> Frequency of <span class="fw-bold"> {{this.selectedWord}} </span></div>
+        <span class="badge bg-primary rounded-pill">{{this.resultFrequency}}</span>
+
+      </li>
+
+      <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo">
+            <div *ngIf="this.resultSimilarWords.length>0">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              Similar Words
+              <span class="badge bg-primary rounded-pill">{{this.resultSimilarWords.length}}</span>
+            </button>
+            </div>
+         
+            
+         
+          </h2>
+          <div *ngIf="this.resultSimilarWords.length!=0" id="collapseTwo" class="accordion-collapse collapse " aria-labelledby="headingTwo"
+            data-bs-parent="#accordionExample">
+            <div class="accordion-body " style="overflow-y: scroll; max-height: 200px; ">
+              
+              <div *ngFor="let word of resultSimilarWords">
+           
+
+                 {{word}}
+                
+              </div>
+              <!-- <span class="fw-bold" > {{resultSimilarWords}} </span> -->
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="error"class="alert alert-danger" role="alert">
+    Some error occured
+  </div>
+</section>

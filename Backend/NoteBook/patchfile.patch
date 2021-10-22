@@ -1,0 +1,614 @@
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ b/pom.xml (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -15,26 +15,18 @@
+     <name>NoteBook</name>
+     <description>NoteBook</description>
+     <properties>
+-        <java.version>17</java.version>
++        <java.version>11</java.version>
+     </properties>
+     <dependencies>
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-web</artifactId>
+         </dependency>
+-
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-test</artifactId>
+             <scope>test</scope>
+         </dependency>
+-
+-        <dependency>
+-            <groupId>org.jetbrains</groupId>
+-            <artifactId>annotations</artifactId>
+-            <version>RELEASE</version>
+-            <scope>compile</scope>
+-        </dependency>
+         <dependency>
+             <groupId>org.springdoc</groupId>
+             <artifactId>springdoc-openapi-ui</artifactId>
+@@ -53,8 +45,8 @@
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <configuration>
+-                    <source>16</source>
+-                    <target>16</target>
++                    <source>${java.version}</source>
++                    <target>${java.version}</target>
+                 </configuration>
+             </plugin>
+         </plugins>
+Index: src/main/java/com/labforward/notebook/controllers/SimilarityController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/controllers/SimilarityController.java b/src/main/java/com/labforward/notebook/controllers/SimilarityController.java
+--- a/src/main/java/com/labforward/notebook/controllers/SimilarityController.java (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ b/src/main/java/com/labforward/notebook/controllers/SimilarityController.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -1,7 +1,8 @@
+ package com.labforward.notebook.controllers;
+ 
+-import com.labforward.notebook.models.NoteBookSimilarityRequest;
+-import com.labforward.notebook.models.SimilarityResponse;
++import com.labforward.notebook.dto.SimilarityRequestDto;
++import com.labforward.notebook.dto.SimilarityResponseDto;
++import com.labforward.notebook.helper.SimilarityCheckHelper;
+ import com.labforward.notebook.service.SimilarityService;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.http.HttpStatus;
+@@ -11,23 +12,28 @@
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.RestController;
+ 
++import javax.validation.Valid;
++
+ /**
+  * Controller class for Similarity Check
+  */
+ @RestController
+ @RequestMapping("/similarity")
+ public class SimilarityController {
++
+     @Autowired
+     SimilarityService service;
+ 
++    @Autowired
++    SimilarityCheckHelper helper;
++
+     /**
+      * Endpoint for getting frequency and similar words for a particular input from user with the notebook
+      */
+     @PostMapping(value = "/check", consumes = "application/json", produces = "application/json")
+-    public ResponseEntity<SimilarityResponse> frequencyAndSimilarWords(@RequestBody NoteBookSimilarityRequest note) {
+-        return new ResponseEntity<>(service.getSimilarity(note), HttpStatus.OK);
++    public SimilarityResponseDto frequencyAndSimilarWords(@RequestBody @Valid SimilarityRequestDto requestDto) {
++        return helper.mapResponse(service.getSimilarity(helper.mapRequest(requestDto)));
+     }
+-
+ 
+ }
+ 
+Index: src/main/java/com/labforward/notebook/dto/SimilarityRequestDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/dto/SimilarityRequestDto.java b/src/main/java/com/labforward/notebook/dto/SimilarityRequestDto.java
+new file mode 100644
+--- /dev/null (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
++++ b/src/main/java/com/labforward/notebook/dto/SimilarityRequestDto.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -0,0 +1,31 @@
++package com.labforward.notebook.dto;
++
++import javax.validation.constraints.NotEmpty;
++
++/**
++ * Request Model for the Similarity Request
++ */
++public class SimilarityRequestDto {
++
++    @NotEmpty
++    private String content;
++
++    @NotEmpty
++    private String word;
++
++    public String getContent() {
++        return content;
++    }
++
++    public String getWord() {
++        return word;
++    }
++
++    public void setContent(String content) {
++        this.content = content;
++    }
++
++    public void setWord(String word) {
++        this.word = word;
++    }
++}
+Index: src/main/java/com/labforward/notebook/models/SimilarityResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/models/SimilarityResponse.java b/src/main/java/com/labforward/notebook/dto/SimilarityResponseDto.java
+rename from src/main/java/com/labforward/notebook/models/SimilarityResponse.java
+rename to src/main/java/com/labforward/notebook/dto/SimilarityResponseDto.java
+--- a/src/main/java/com/labforward/notebook/models/SimilarityResponse.java (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ b/src/main/java/com/labforward/notebook/dto/SimilarityResponseDto.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -1,22 +1,23 @@
+-package com.labforward.notebook.models;
++package com.labforward.notebook.dto;
+ 
+ import java.util.List;
+ 
+ /**
+  * Response Model for the  Similarity Check POST API Request for a Word
+  */
+-public class SimilarityResponse {
++public class SimilarityResponseDto {
++
+     private final String word;
++
+     private final int frequencyCount;
++
+     private final List<String> similarWords;
+ 
+-
+-    public SimilarityResponse(int count, String data, List<String> words) {
+-        this.word = data;
+-        this.frequencyCount = count;
+-        this.similarWords = words;
++    public SimilarityResponseDto(String word, int frequencyCount, List<String> similarWords) {
++        this.word = word;
++        this.frequencyCount = frequencyCount;
++        this.similarWords = similarWords;
+     }
+-
+ 
+     public int getFrequencyCount() {
+         return frequencyCount;
+Index: src/main/java/com/labforward/notebook/helper/SimilarityCheck.java
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/helper/SimilarityCheck.java b/src/main/java/com/labforward/notebook/helper/SimilarityCheck.java
+deleted file mode 100644
+--- a/src/main/java/com/labforward/notebook/helper/SimilarityCheck.java (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ /dev/null (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
+@@ -1,133 +0,0 @@
+-package com.labforward.notebook.helper;
+-
+-import org.jetbrains.annotations.NotNull;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-/**
+- * Helper Class for Similarity Check
+- */
+-public class SimilarityCheck {
+-
+-    /**
+-     * Helper method to frequency of word in a content
+-     */
+-    public int frequencyOfWord(String content, String word) {
+-        String[] words = content.split(" ");
+-        int occurrences = 0;
+-        for (String s : words) {
+-            if (s.equals(word)) {
+-                occurrences++;
+-            }
+-
+-        }
+-        return occurrences;
+-    }
+-
+-
+-    /**
+-     * Helper method to frequency of word in a content
+-     */
+-    public final double distance(final String s1, final String s2) {
+-        return distance(s1, s2, Integer.MAX_VALUE);
+-    }
+-
+-
+-    public final double distance(final String s1, final String s2,
+-                                 final int limit) {
+-        if (s1 == null) {
+-            throw new NullPointerException("s1 must not be null");
+-        }
+-
+-        if (s2 == null) {
+-            throw new NullPointerException("s2 must not be null");
+-        }
+-
+-        if (s1.equals(s2)) {
+-            return 0;
+-        }
+-
+-        if (s1.length() == 0) {
+-            return s2.length();
+-        }
+-
+-        if (s2.length() == 0) {
+-            return s1.length();
+-        }
+-
+-        // create two work vectors of integer distances
+-        int[] v0 = new int[s2.length() + 1];
+-        int[] v1 = new int[s2.length() + 1];
+-        int[] vtemp;
+-
+-        // initialize v0 (the previous row of distances)
+-        // this row is A[0][i]: edit distance for an empty s
+-        // the distance is just the number of characters to delete from t
+-        for (int i = 0; i < v0.length; i++) {
+-            v0[i] = i;
+-        }
+-
+-        for (int i = 0; i < s1.length(); i++) {
+-            // calculate v1 (current row distances) from the previous row v0
+-            // first element of v1 is A[i+1][0]
+-            //   edit distance is delete (i+1) chars from s to match empty t
+-            v1[0] = i + 1;
+-
+-            int minv1 = v1[0];
+-
+-            // use formula to fill in the rest of the row
+-            for (int j = 0; j < s2.length(); j++) {
+-                int cost = 1;
+-                if (s1.charAt(i) == s2.charAt(j)) {
+-                    cost = 0;
+-                }
+-                v1[j + 1] = Math.min(
+-                        v1[j] + 1,              // Cost of insertion
+-                        Math.min(
+-                                v0[j + 1] + 1,  // Cost of remove
+-                                v0[j] + cost)); // Cost of substitution
+-
+-                minv1 = Math.min(minv1, v1[j + 1]);
+-            }
+-
+-            if (minv1 >= limit) {
+-                return limit;
+-            }
+-
+-            // copy v1 (current row) to v0 (previous row) for next iteration
+-            //System.arraycopy(v1, 0, v0, 0, v0.length);
+-
+-            // Flip references to current and previous row
+-            vtemp = v0;
+-            v0 = v1;
+-            v1 = vtemp;
+-
+-        }
+-
+-        return v0[s2.length()];
+-    }
+-
+-
+-    /**
+-     * @param content - Complete Note of the user
+-     * @param word - Search string
+-     * @return list of words which are similar to the Note
+-     */
+-    public List<String> levenshteinCheck(String content, String word) {
+-        List<String> similarWords = new ArrayList<>();
+-
+-        for (String checkingWord : content.split(" ")) {
+-            if (!checkingWord.equals(word) && distance(word, checkingWord) >= 1) {
+-                similarWords.add(checkingWord);
+-
+-            }
+-        }
+-        return similarWords;
+-    }
+-
+-
+-}
+-
+-
+-
+Index: src/main/java/com/labforward/notebook/helper/SimilarityCheckHelper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/helper/SimilarityCheckHelper.java b/src/main/java/com/labforward/notebook/helper/SimilarityCheckHelper.java
+new file mode 100644
+--- /dev/null (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
++++ b/src/main/java/com/labforward/notebook/helper/SimilarityCheckHelper.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -0,0 +1,30 @@
++package com.labforward.notebook.helper;
++
++import com.labforward.notebook.dto.SimilarityRequestDto;
++import com.labforward.notebook.dto.SimilarityResponseDto;
++import com.labforward.notebook.models.SimilarityCheckRequestModel;
++import com.labforward.notebook.models.SimilarityCheckResultModel;
++
++import javax.validation.Valid;
++
++/**
++ * Helper Class for Similarity Check
++ */
++public class SimilarityCheckHelper {
++
++    public SimilarityCheckRequestModel mapRequest(@Valid SimilarityRequestDto requestDto) {
++        SimilarityCheckRequestModel requestModel = new SimilarityCheckRequestModel();
++        requestModel.setContent(requestDto.getContent());
++        requestModel.setWord(requestDto.getWord());
++        return requestModel;
++    }
++
++    public SimilarityResponseDto mapResponse(SimilarityCheckResultModel resultModel) {
++        return new SimilarityResponseDto(resultModel.getWord(), resultModel.getFrequencyCount(),
++                resultModel.getSimilarWords());
++    }
++
++}
++
++
++
+Index: src/main/java/com/labforward/notebook/models/NoteBookSimilarityRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/models/NoteBookSimilarityRequest.java b/src/main/java/com/labforward/notebook/models/SimilarityCheckRequestModel.java
+rename from src/main/java/com/labforward/notebook/models/NoteBookSimilarityRequest.java
+rename to src/main/java/com/labforward/notebook/models/SimilarityCheckRequestModel.java
+--- a/src/main/java/com/labforward/notebook/models/NoteBookSimilarityRequest.java (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ b/src/main/java/com/labforward/notebook/models/SimilarityCheckRequestModel.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -3,7 +3,7 @@
+ /**
+  * Request Model for the Similarity Request
+  */
+-public class NoteBookSimilarityRequest {
++public class SimilarityCheckRequestModel {
+     private String content;
+     private String word;
+ 
+Index: src/main/java/com/labforward/notebook/models/SimilarityCheckResultModel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/models/SimilarityCheckResultModel.java b/src/main/java/com/labforward/notebook/models/SimilarityCheckResultModel.java
+new file mode 100644
+--- /dev/null (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
++++ b/src/main/java/com/labforward/notebook/models/SimilarityCheckResultModel.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -0,0 +1,48 @@
++package com.labforward.notebook.models;
++
++import java.util.List;
++
++/**
++ * Response Model for the  Similarity Check POST API Request for a Word
++ */
++public class SimilarityCheckResultModel {
++
++    private String word;
++
++    private int frequencyCount;
++
++    private List<String> similarWords;
++
++    public SimilarityCheckResultModel(String word, int frequencyCount, List<String> similarWords) {
++        this.word = word;
++        this.frequencyCount = frequencyCount;
++        this.similarWords = similarWords;
++    }
++
++    public SimilarityCheckResultModel() {
++    }
++
++    public String getWord() {
++        return word;
++    }
++
++    public void setWord(String word) {
++        this.word = word;
++    }
++
++    public int getFrequencyCount() {
++        return frequencyCount;
++    }
++
++    public void setFrequencyCount(int frequencyCount) {
++        this.frequencyCount = frequencyCount;
++    }
++
++    public List<String> getSimilarWords() {
++        return similarWords;
++    }
++
++    public void setSimilarWords(List<String> similarWords) {
++        this.similarWords = similarWords;
++    }
++}
+Index: src/main/java/com/labforward/notebook/service/SimilarityService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/service/SimilarityService.java b/src/main/java/com/labforward/notebook/service/SimilarityService.java
+--- a/src/main/java/com/labforward/notebook/service/SimilarityService.java (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ b/src/main/java/com/labforward/notebook/service/SimilarityService.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -1,11 +1,12 @@
+ package com.labforward.notebook.service;
+ 
+-import com.labforward.notebook.models.NoteBookSimilarityRequest;
+-import com.labforward.notebook.models.SimilarityResponse;
++import com.labforward.notebook.models.SimilarityCheckRequestModel;
++import com.labforward.notebook.models.SimilarityCheckResultModel;
+ 
+ /**
+  * Service Interface for Similarity Check
+  */
+ public interface SimilarityService {
+-    SimilarityResponse getSimilarity(NoteBookSimilarityRequest note);
++
++    SimilarityCheckResultModel getSimilarity(SimilarityCheckRequestModel note);
+ }
+Index: src/main/java/com/labforward/notebook/service/SimilarityServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/labforward/notebook/service/SimilarityServiceImpl.java b/src/main/java/com/labforward/notebook/service/SimilarityServiceImpl.java
+--- a/src/main/java/com/labforward/notebook/service/SimilarityServiceImpl.java (revision 1ef5358f8a18ea01d8b0976c8af2a7962f916ec0)
++++ b/src/main/java/com/labforward/notebook/service/SimilarityServiceImpl.java (revision 594f6e72ddd20b80a94cedaaff86be3f3c2d5af3)
+@@ -1,11 +1,12 @@
+ package com.labforward.notebook.service;
+ 
+-import com.labforward.notebook.helper.SimilarityCheck;
+-import com.labforward.notebook.models.NoteBookSimilarityRequest;
+-import com.labforward.notebook.models.SimilarityResponse;
++import com.labforward.notebook.models.SimilarityCheckRequestModel;
++import com.labforward.notebook.models.SimilarityCheckResultModel;
+ import org.springframework.stereotype.Service;
+ 
++import java.util.Arrays;
+ import java.util.List;
++import java.util.stream.Collectors;
+ 
+ /**
+  * Service implementation for Similarity Check
+@@ -14,22 +15,121 @@
+ @Service
+ public class SimilarityServiceImpl implements SimilarityService {
+ 
+-    public SimilarityCheck check = new SimilarityCheck();
+-
+     /**
+      * Service method to get the frequency and similar words
+      */
+     @Override
+-    public SimilarityResponse getSimilarity(NoteBookSimilarityRequest note) {
++    public SimilarityCheckResultModel getSimilarity(SimilarityCheckRequestModel note) {
+ 
+         String word = note.getWord();
+         String content = note.getContent();
+ 
++        int occurrences = frequencyOfWord(content, word);
+ 
+-        int occurrences = check.frequencyOfWord(content, word);
++        List<String> similarWords = levenshteinCheck(content, word);
+ 
+-        List<String> similarWords = check.levenshteinCheck(content, word);
++        return new SimilarityCheckResultModel(word, occurrences, similarWords);
++    }
+ 
+-        return new SimilarityResponse(occurrences, word, similarWords);
++    /**
++     * Helper method to frequency of word in a content
++     */
++    private int frequencyOfWord(String content, String word) {
++        return (int)Arrays
++                .stream(content.split("\\s+"))
++                .filter(word::equals)
++                .count();
+     }
++
++    /**
++     * Helper method to frequency of word in a content
++     */
++    private double distance(final String s1, final String s2) {
++        return distance(s1, s2, Integer.MAX_VALUE);
++    }
++
++    private double distance(final String s1, final String s2, final int limit) {
++        if (s1 == null) {
++            throw new NullPointerException("s1 must not be null");
++        }
++
++        if (s2 == null) {
++            throw new NullPointerException("s2 must not be null");
++        }
++
++        if (s1.equals(s2)) {
++            return 0;
++        }
++
++        if (s1.length() == 0) {
++            return s2.length();
++        }
++
++        if (s2.length() == 0) {
++            return s1.length();
++        }
++
++        // create two work vectors of integer distances
++        int[] v0 = new int[s2.length() + 1];
++        int[] v1 = new int[s2.length() + 1];
++        int[] vtemp;
++
++        // initialize v0 (the previous row of distances)
++        // this row is A[0][i]: edit distance for an empty s
++        // the distance is just the number of characters to delete from t
++        for (int i = 0; i < v0.length; i++) {
++            v0[i] = i;
++        }
++
++        for (int i = 0; i < s1.length(); i++) {
++            // calculate v1 (current row distances) from the previous row v0
++            // first element of v1 is A[i+1][0]
++            //   edit distance is delete (i+1) chars from s to match empty t
++            v1[0] = i + 1;
++
++            int minv1 = v1[0];
++
++            // use formula to fill in the rest of the row
++            for (int j = 0; j < s2.length(); j++) {
++                int cost = 1;
++                if (s1.charAt(i) == s2.charAt(j)) {
++                    cost = 0;
++                }
++                v1[j + 1] = Math.min(v1[j] + 1,              // Cost of insertion
++                        Math.min(v0[j + 1] + 1,  // Cost of remove
++                                v0[j] + cost)); // Cost of substitution
++
++                minv1 = Math.min(minv1, v1[j + 1]);
++            }
++
++            if (minv1 >= limit) {
++                return limit;
++            }
++
++            // copy v1 (current row) to v0 (previous row) for next iteration
++            //System.arraycopy(v1, 0, v0, 0, v0.length);
++
++            // Flip references to current and previous row
++            vtemp = v0;
++            v0 = v1;
++            v1 = vtemp;
++
++        }
++
++        return v0[s2.length()];
++    }
++
++    /**
++     * @param content - Complete Note of the user
++     * @param word - Search string
++     * @return list of words which are similar to the Note
++     */
++    private List<String> levenshteinCheck(String content, String word) {
++        return Arrays
++                .stream(content.split("\\s+"))
++                .filter(s -> !word.equals(s))
++                .filter(s -> distance(word, s) >= 11)
++                .collect(Collectors.toList());
++    }
++
+ }
