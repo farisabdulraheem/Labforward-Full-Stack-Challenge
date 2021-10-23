@@ -1,6 +1,12 @@
 # Labforward-Full-Stack-Challenge
 
 A simple Note making Application which on click of the word give you the frequency and similar words.
+
+
+
+
+![alt text](https://github.com/farisabdulraheem/Labforward-Full-Stack-Challenge/blob/main/PageView.png)
+
 ### Notes Project Backend End
 
 #### In order to run the Notes Application. In the project directory - Backend/NoteBook, you can run the Spring Boot Application as follow:
@@ -36,4 +42,16 @@ Unit test cases are also written.
 #### Open [http://localhost:4200](http://localhost:4200) to view it in the browser.
 
 
+### Time taken to Do the Project
+#### -Backend Development -2.5 hours
+#### -Backend Reporting and testing-1hour
+#### -Frontent Development and Testing - 2.5 hours
+#### -Deploying and Documentation - 30 minutes
+#### -Total : 6.5 hours
 
+
+### If I had more time I would have developed the following
+#### -Adding Multi Page Note section and saving/indexing to  search friendly database that supports indexing and fast search (like lucene or elastic search)
+#### -Better UI/UX for the user
+#### -Auth and db integration in the backend
+#### -More unit Testing and integration tests
